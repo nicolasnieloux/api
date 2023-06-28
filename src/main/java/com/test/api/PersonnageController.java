@@ -3,14 +3,16 @@ package com.test.api;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.ui.Model;
+
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
-import static com.test.api.Type.Magicien;
+
 
 @RestController
 
@@ -59,7 +61,7 @@ public class PersonnageController {
         personnages.add(personnage);
         this.idCount++;
 
-        return ResponseEntity.ok("Personnage ajouté avec succès");
+        return ResponseEntity.ok("personnage crée!");
     }
 
 
@@ -73,6 +75,13 @@ public class PersonnageController {
                             content = @Content(
                                     mediaType = "application/json"
                             )
+                    ),
+                    @ApiResponse(
+                            responseCode = "403",
+                            description = "id n'existe pas",
+                            content = @Content(
+                                    mediaType = "application/json"
+                            )
                     )
             }
     )
@@ -80,34 +89,67 @@ public class PersonnageController {
     public ResponseEntity<Personnage> findPersonnage(@PathVariable("id") int id) {
 
 
-        Personnage personnage = personnages.stream().filter(person -> person.getId() == id).findFirst().orElse(null);
+        Optional<Personnage> optionalPersonnage = personnages.stream()
+                .filter(person -> person.getId() == id)
+                .findFirst();
 
-        return ResponseEntity.ok(personnage);
+        if (optionalPersonnage.isPresent()) {
+            Personnage personnage = optionalPersonnage.get();
+            return ResponseEntity.ok(personnage);
+        } else {
+            ResponseEntity<Personnage> responseEntity = new ResponseEntity(null,HttpStatus.NOT_FOUND);
+            return responseEntity;
+        }
+
     }
 
     @PutMapping("/personnage/{id}")
-
+    @Operation(
+            description = "Modif d'un personnage",
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "Modif réalisé",
+                            content = @Content(
+                                    mediaType = "application/json"
+                            )
+                    ),
+                    @ApiResponse(
+                            responseCode = "404",
+                            description = "id n'existe pas",
+                            content = @Content(
+                                    mediaType = "application/json"
+                            )
+                    )
+            }
+    )
     public ResponseEntity<Personnage> updatePersonnage(@PathVariable("id") int id,
-                                                       @RequestParam("name") String name,
-                                                       @RequestParam("type") String type) {
+                                                       @RequestBody Personnage personnageToUpdate) {
 
-        Personnage personnage = personnages.stream()
+        Optional<Personnage> optionalPersonnage = personnages.stream()
                 .filter(person -> person.getId() == id)
-                .findFirst()
-                .orElse(null);
+                .findFirst();
 
-        personnage.setName(name);
-        personnage.setType(Type.valueOf(type));
+        if (optionalPersonnage.isPresent()) {
+            Personnage personnage = optionalPersonnage.get();
+            personnage.setName(personnageToUpdate.getName());
+            personnage.setType(personnageToUpdate.getType());
 
+            return ResponseEntity.ok(personnage);
+        } else {
 
-        return ResponseEntity.ok(personnage);
+            return ResponseEntity.notFound().build();
+        }
 }
 
     @DeleteMapping("/personnage/{id}")
     public ResponseEntity<String> deletePersonnage(@PathVariable("id") int id) {
-        Personnage personnage = personnages.stream().filter(person -> person.getId() == id).findFirst().orElse(null);
+        Personnage personnage = personnages.stream().filter(person -> person.getId() == id)
+                .findFirst()
+                .orElse(null);
+
         personnages.remove(personnage);
 
-        return ResponseEntity.ok("Personnage supprimé avec succès");
+        return ResponseEntity.ok("Personnage supprimé");
     }
 }
