@@ -52,16 +52,18 @@ public class PersonnageController {
             }
     )
 
-    public ResponseEntity<String> ajouterPersonnage(
-            @RequestParam("name") String name,
-            @RequestParam("type") String type) {
+    public Personnage ajouterPersonnage(
+             @RequestBody Personnage personnage) {
+
+        String name = personnage.getName();
+        Type type= personnage.getType();
 
 
-        Personnage personnage = new Personnage(this.idCount, name, Type.valueOf(type), 10);
-        personnages.add(personnage);
+        Personnage personnageNew = new Personnage(this.idCount, name, type, 10);
+        personnages.add(personnageNew);
         this.idCount++;
 
-        return ResponseEntity.ok("personnage crée!");
+        return personnageNew;
     }
 
 
@@ -134,6 +136,7 @@ public class PersonnageController {
             Personnage personnage = optionalPersonnage.get();
             personnage.setName(personnageToUpdate.getName());
             personnage.setType(personnageToUpdate.getType());
+            personnage.setLifePoint(personnageToUpdate.getLifePoint());
 
             return ResponseEntity.ok(personnage);
         } else {
