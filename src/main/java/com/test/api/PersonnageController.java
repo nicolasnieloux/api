@@ -125,24 +125,17 @@ public class PersonnageController {
                     )
             }
     )
-    public ResponseEntity<Personnage> updatePersonnage(@PathVariable("id") int id,
+    public Personnage updatePersonnage(@PathVariable("id") int id,
                                                        @RequestBody Personnage personnageToUpdate) {
 
-        Optional<Personnage> optionalPersonnage = personnages.stream()
-                .filter(person -> person.getId() == id)
-                .findFirst();
+        Personnage personnage = personnages.stream().filter(person -> person.getId() == id).findFirst().orElse(null);
 
-        if (optionalPersonnage.isPresent()) {
-            Personnage personnage = optionalPersonnage.get();
             personnage.setName(personnageToUpdate.getName());
             personnage.setType(personnageToUpdate.getType());
             personnage.setLifePoint(personnageToUpdate.getLifePoint());
 
-            return ResponseEntity.ok(personnage);
-        } else {
+            return personnage;
 
-            return ResponseEntity.notFound().build();
-        }
 }
 
     @DeleteMapping("/personnage/{id}")
