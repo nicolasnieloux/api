@@ -1,18 +1,13 @@
 package com.test.api;
 
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import org.springframework.http.ResponseEntity;
-
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 
 @RestController
 
 public class PersonnageController {
+
+
     private final PersonnageDao personnageDao;
 
     public PersonnageController(PersonnageDao personnageDao){
@@ -21,21 +16,10 @@ public class PersonnageController {
     private int idCount;
 
     @GetMapping("/personnage")
-    @Operation(
-            description = "Liste des personnages",
-            responses = {
-                    @ApiResponse(
-                            responseCode = "200",
-                            description = "Liste ok!",
-                            content = @Content(
-                                    mediaType = "application/json"
-                            )
-                    )
-            }
-    )
-    public List<Personnage> getPersonages() {
+    public Iterable<Personnage> getPersonages() {
 
-        return personnageDao.findAll();
+        Iterable<Personnage> personnages = personnageDao.findAll();
+        return personnages;
     }
 //
 //    @PostMapping("/personnage")
@@ -67,11 +51,11 @@ public class PersonnageController {
 //    }
 ////
 
-    @GetMapping("/personnage/{id}")
-       public Personnage findPersonnage(@PathVariable("id") int id) {
-            return personnageDao.findById(id);
-
-    }
+//    @GetMapping("/personnage/{id}")
+//       public Personnage findPersonnage(@PathVariable("id") int id) {
+//            return personnageDao.findById(id);
+//
+//    }
 
 //    @PutMapping("/personnage/{id}")
 //      public Personnage updatePersonnage(@PathVariable("id") int id,

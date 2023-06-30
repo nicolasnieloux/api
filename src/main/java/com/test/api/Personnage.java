@@ -1,6 +1,13 @@
 package com.test.api;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
+
+@Entity
 public class Personnage {
+    @Id
+    @GeneratedValue
     private int id;
     private String name;
 
@@ -15,7 +22,8 @@ public class Personnage {
         this.lifePoint = lifePoint;
     }
 
-
+    public Personnage() {
+    }
 
     public int getId() {
         return id;
