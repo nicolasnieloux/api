@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.*;
 
 public class PersonnageController {
 
-
     private final PersonnageDao personnageDao;
 
     public PersonnageController(PersonnageDao personnageDao){
@@ -51,11 +50,11 @@ public class PersonnageController {
 //    }
 ////
 
-//    @GetMapping("/personnage/{id}")
-//       public Personnage findPersonnage(@PathVariable("id") int id) {
-//            return personnageDao.findById(id);
-//
-//    }
+    @GetMapping("/personnage/{id}")
+       public Personnage findPersonnage(@PathVariable("id") int id) {
+            return personnageDao.findById(id);
+
+    }
 
 //    @PutMapping("/personnage/{id}")
 //      public Personnage updatePersonnage(@PathVariable("id") int id,
@@ -71,14 +70,10 @@ public class PersonnageController {
 //
 //}
 //
-//    @DeleteMapping("/personnage/{id}")
-//    public ResponseEntity<String> deletePersonnage(@PathVariable("id") int id) {
-//        Personnage personnage = personnages.stream().filter(person -> person.getId() == id)
-//                .findFirst()
-//                .orElse(null);
-//
-//        personnages.remove(personnage);
-//
-//        return ResponseEntity.ok("Personnage supprimé");
-//    }
+    @DeleteMapping("/personnage/{id}")
+    public void deletePersonnage(@PathVariable("id") int id) {
+
+        personnageDao.deleteById(id);
+
+    }
 }
