@@ -1,10 +1,12 @@
 package com.test.api;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
+import java.util.Optional;
 
 
 @RestController
@@ -45,11 +47,18 @@ public class PersonnageController {
 //
 
     @GetMapping("/personnage/{id}")
-    public Personnage findPersonnage(@PathVariable("id") int id) {
-        return personnageDao.findById(id);
+    public ResponseEntity<Personnage> findPersonnage(@PathVariable("id") int id) {
 
+        Optional<Personnage> optionalPersonnage = Optional.ofNullable(personnageDao.findById(id));
+
+        if (optionalPersonnage.isPresent()) {
+            Personnage personnage = optionalPersonnage.get();
+            return ResponseEntity.ok(personnage);
+        } else {
+            ResponseEntity<Personnage> responseEntity = new ResponseEntity(null, HttpStatus.NOT_FOUND);
+            return responseEntity;
+        }
     }
-
 
     @DeleteMapping("/personnage/{id}")
     public void deletePersonnage(@PathVariable("id") int id) {
