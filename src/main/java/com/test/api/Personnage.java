@@ -22,6 +22,11 @@ public class Personnage {
         this.lifePoint = lifePoint;
     }
 
+    public Personnage(String name, Type type) {
+        this.name = name;
+        this.type = type;
+    }
+
     public Personnage() {
     }
 

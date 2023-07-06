@@ -7,9 +7,5 @@ import java.util.List;
 
 
 public interface PersonnageDao extends JpaRepository<Personnage, Integer> {
-    List<Personnage> findAll();
-    Personnage findById(int id);
-    Personnage save(Personnage personnage);
-    void deleteById(int id);
 
 }

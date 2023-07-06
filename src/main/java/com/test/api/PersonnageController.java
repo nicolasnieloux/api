@@ -3,6 +3,7 @@ package com.test.api;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
@@ -24,39 +25,36 @@ public class PersonnageController {
     @GetMapping("/personnage")
     public Iterable<Personnage> getPersonages() {
 
-        Iterable<Personnage> personnages = personnageDao.findAll();
-        return personnages;
+        return personnageDao.findAll();
     }
 
     @PostMapping("/personnage")
 
-    public ResponseEntity<Void> ajouterPersonnage(
+    public Personnage ajouterPersonnage(
             @RequestBody Personnage personnage) {
 
-        Personnage personnageAdd = personnageDao.save(personnage);
-        if (personnageAdd == null)
-            return ResponseEntity.noContent().build();
+        if (personnageDao.existsById(personnage.getId())) {
+            throw new ResponseStatusException(HttpStatus.NOT_MODIFIED, "déjà existant");
+        }
+        String name = personnage.getName();
+        Type type = Type.valueOf(String.valueOf(personnage.getType()));
 
-        URI location = ServletUriComponentsBuilder
-                .fromCurrentRequest()
-                .path("/{id}")
-                .buildAndExpand(personnageAdd.getId())
-                .toUri();
-        return ResponseEntity.created(location).build();
+        Personnage perso = new Personnage(name, type);
+        personnageDao.save(perso);
+        return perso;
     }
 //
 
     @GetMapping("/personnage/{id}")
     public ResponseEntity<Personnage> findPersonnage(@PathVariable("id") int id) {
 
-        Optional<Personnage> optionalPersonnage = Optional.ofNullable(personnageDao.findById(id));
+        Optional<Personnage> optionalPersonnage = personnageDao.findById(id);
 
         if (optionalPersonnage.isPresent()) {
             Personnage personnage = optionalPersonnage.get();
             return ResponseEntity.ok(personnage);
         } else {
-            ResponseEntity<Personnage> responseEntity = new ResponseEntity(null, HttpStatus.NOT_FOUND);
-            return responseEntity;
+            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
         }
     }
 
@@ -70,13 +68,19 @@ public class PersonnageController {
     public Personnage updatePersonnage(@PathVariable("id") int id,
                                        @RequestBody Personnage personnageToUpdate) {
 
-        Personnage personnage = personnageDao.findById(id);
+        Optional<Personnage> personnage = personnageDao.findById(id);
 
-        personnage.setName(personnageToUpdate.getName());
-        personnage.setType(personnageToUpdate.getType());
-        personnage.setLifePoint(personnageToUpdate.getLifePoint());
+        if (personnage.isPresent()) {
+            Personnage perso = personnage.get();
+            perso.setName(personnageToUpdate.getName());
 
-        return personnageDao.save(personnage);
+            perso.setType(personnageToUpdate.getType());
+            perso.setLifePoint(personnageToUpdate.getLifePoint());
+
+            personnageDao.save(perso);
+        }
+
+        return null;
 
     }
 
